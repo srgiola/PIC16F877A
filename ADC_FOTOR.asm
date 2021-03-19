@@ -1,0 +1,245 @@
+; PIC16F877A Configuration Bit Settings
+; CONFIG
+; __config 0xFF32
+;__CONFIG _FOSC_HS & _WDTE_OFF & _PWRTE_ON & _BOREN_OFF & _LVP_OFF & _CPD_OFF & _WRT_OFF & _CP_OFF
+
+DATO EQU 0x24
+NUM EQU 0x23
+
+   ORG        0
+    GOTO    INICIO
+
+INICIO
+    BSF    STATUS,RP0
+    CLRF    TRISD ;SALIDA
+    CLRF    TRISB ;SALIDA
+    BSF    TRISA,0; RA0 ENTRADA
+
+    CLRF    TRISC; SALIDA
+    BSF    ADCON1,3 ;1
+    BSF    ADCON1,2 ;1
+    BSF    ADCON1,1 ;1
+    BCF    ADCON1,0 ;0 1110-> RAO AN0 = ANALOGO
+    BSF    ADCON1,6 ;FRECUENCIA OSCILADOR
+    BCF    ADCON1,7 ;JUSTIFICACION IZQ
+    BCF    STATUS,RP0
+    BSF    ADCON0,7
+    BCF    ADCON0,6
+    BCF    ADCON0,5
+    BCF    ADCON0,4
+    BCF    ADCON0,3 ;CANAL AN0
+    BSF    ADCON0,0 ;ADC ON
+START
+    BSF    ADCON0,2;GO/DONE -> 1
+ADC    BTFSC    ADCON0,2
+    GOTO    ADC
+    MOVF    ADRESH,W
+    MOVWF    PORTD ;SALIDA DE PORTD MAS SIGNIFICATIVOS
+    BSF    STATUS,RP0
+    MOVF    ADRESL,W
+    BCF    STATUS,RP0
+    MOVWF    PORTC ;SALIDA DE PORTC MENOS SIGNIFICATIVOS
+	CALL	Incrementico
+    GOTO    START
+;C6 C7 D6 D7
+Incrementico
+	BTFSC	PORTC,6
+	GOTO	Comprobar1
+	BTFSC	PORTC,7
+	GOTO	Comprobar1
+	BTFSC	PORTD,6
+	GOTO	Comprobar1
+	BTFSC	PORTD,7
+	GOTO	Comprobar1
+	GOTO	Llamar0
+Comprobar1
+	BTFSC	PORTC,6
+	GOTO	Comprobar2
+	BTFSS	PORTC,7
+	GOTO	Comprobar2
+	BTFSC	PORTD,6
+	GOTO	Comprobar2
+	BTFSC	PORTD,7
+	GOTO	Comprobar2
+	GOTO	Llamar1
+Comprobar2
+	BTFSC	PORTC,6
+	GOTO	Comprobar3
+	BTFSC	PORTC,7
+	GOTO	Comprobar3
+	BTFSS	PORTD,6
+	GOTO	Comprobar3
+	BTFSC	PORTD,7
+	GOTO	Comprobar3
+	GOTO	Llamar2
+Comprobar3
+	BTFSS	PORTC,6
+	GOTO	Comprobar4
+	BTFSC	PORTC,7
+	GOTO	Comprobar4
+	BTFSS	PORTD,6
+	GOTO	Comprobar4
+	BTFSC	PORTD,7
+	GOTO	Comprobar4
+	GOTO	Llamar3
+
+Comprobar4
+	BTFSS	PORTC,6
+	GOTO	Comprobar5
+	BTFSS	PORTC,7
+	GOTO	Comprobar5
+	BTFSS	PORTD,6
+	GOTO	Comprobar5
+	BTFSC	PORTD,7
+	GOTO	Comprobar5
+	GOTO	Llamar4
+Comprobar5
+	BTFSS	PORTC,6
+	GOTO	Comprobar6
+	BTFSC	PORTC,7
+	GOTO	Comprobar6
+	BTFSC	PORTD,6
+	GOTO	Comprobar6
+	BTFSS	PORTD,7
+	GOTO	Comprobar6
+	GOTO	Llamar5
+Comprobar6
+	BTFSC	PORTC,6
+	GOTO	Comprobar7
+	BTFSS	PORTC,7
+	GOTO	Comprobar7
+	BTFSC	PORTD,6
+	GOTO	Comprobar7
+	BTFSS	PORTD,7
+	GOTO	Comprobar7
+	GOTO	Llamar6
+Comprobar7
+	BTFSC	PORTC,6
+	GOTO	Comprobar8
+	BTFSC	PORTC,7
+	GOTO	Comprobar8
+	BTFSS	PORTD,6
+	GOTO	Comprobar8
+	BTFSS	PORTD,7
+	GOTO	Comprobar8
+	GOTO	Llamar7
+	;GOTO	BAJA
+Comprobar8
+	BTFSC	PORTC,6
+	GOTO	Comprobar9
+	BTFSS	PORTC,7
+	GOTO	Comprobar9
+	BTFSS	PORTD,6
+	GOTO	Comprobar9
+	BTFSS	PORTD,7
+	GOTO	Comprobar9
+	GOTO	LLamar8
+	;GOTO 	NORMAL
+Comprobar9
+	BTFSS	PORTC,6
+	GOTO	Terminar
+	BTFSS	PORTC,7
+	GOTO	Terminar
+	BTFSS	PORTD,6
+	GOTO	Terminar
+	BTFSS	PORTD,7
+	GOTO	Terminar
+	GOTO	Llamar9
+
+LLamar0
+	CALL	Numerito0
+	GOTO	Terminar
+LLamar1
+	CALL	Numero1
+	GOTO	Terminar
+LLamar2
+	CALL	Numero2
+	GOTO	Terminar
+	GOTO	Terminar
+Llamar3
+	CALL	Numero3
+	GOTO	Terminar
+Llamar4
+	CALL	Numero4
+	GOTO	Terminar
+Llamar5
+	CALL	Numero5
+	GOTO	Terminar
+Llamar6
+	CALL	Numero6
+	GOTO	Terminar
+Llamar7
+	CALL	Numero7
+	GOTO	Terminar
+Llamar8
+	CALL	Numero8
+	GOTO	Terminar
+Llamar9
+	CALL	Numero9
+	GOTO	Terminar
+
+Numerito0
+	MOVLW	B'00111111'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+
+Numero1
+	MOVLW	B'00000110'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+Numero2
+	MOVLW	B'01011011'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+Numero3
+	MOVLW	B'01001111'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+Numero4
+	MOVLW	B'01100110'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+Numero5
+
+	MOVLW	B'00010101'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+Numero6
+	MOVLW	B'00010101'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+Numero7
+	MOVLW	B'00010101'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+Numero8
+	MOVLW	B'00010101'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+Numero9
+	MOVLW	B'01001110'
+	MOVWF	NUM
+	MOVF	NUM, W
+	MOVWF	PORTB
+	RETURN
+
+Terminar
+	RETURN
